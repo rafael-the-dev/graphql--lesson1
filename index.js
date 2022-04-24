@@ -77,6 +77,7 @@ const typeDefs = gql`
 
     type Mutation {
         addBook(title: String, author: String): Book
+        addTodo(name: String!): Todo
     }
     
 `;
@@ -86,6 +87,20 @@ const resolvers = {
         addBook: (_, { title, author }) => {
             addBook({ authorName: author, bookTitle: title });
             return books[books.length - 1];
+        },
+        async addTodo(_, { name }) {
+            try {
+                await dbQuery({ query: `INSERT INTO todos (name) VALUES ("${name}")` });
+                const todos = await dbQuery({ query: "SELECT * FROM todos" });
+
+                if(todos.length > 0) return todos[todos.length - 1];
+                
+                return { ID: -1, name: "" };
+            } catch(err) {
+                console.error(err);
+                return { ID: -1, name: "" };
+            }
+
         }
     },
     Query: {
