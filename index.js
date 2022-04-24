@@ -5,12 +5,24 @@ const connection = createConnection({
     database: "lesson",
     host: "localhost",
     password: "",
-    user: "root,"
+    user: "root"
 });
 
 connection.connect(() => {
     console.log("connection created")
 });
+
+const dbQuery = ({ query }) => {
+    return new Promise((resolve, reject) => {
+        connection.query(query, (error, results) => {
+            if(error) {
+                return reject(error);
+            }
+
+            resolve(results);
+        });
+    });
+};
 
 const authors = [
     {
@@ -52,9 +64,15 @@ const typeDefs = gql`
         books: [Book]
     }
 
+    type Todo {
+        ID: Int!
+        name: String!
+    }
+
     type Query {
         authors: [Author]
         books: [Book]
+        todos: [Todo]
     }
 
     type Mutation {
@@ -72,7 +90,16 @@ const resolvers = {
     },
     Query: {
         authors: () => authors,
-        books: () => books
+        books: () => books,
+        todos: async () => {
+            try  {
+                const todos = await dbQuery({ query: "SELECT * FROM todos" });
+                return todos;
+            } catch(err) {
+                console.error(err);
+                return [];
+            }
+        }
     }
 };
 
