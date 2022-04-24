@@ -73,6 +73,7 @@ const typeDefs = gql`
         authors: [Author]
         books: [Book]
         todos: [Todo]
+        todo(id: Int): Todo
     }
 
     type Mutation {
@@ -114,6 +115,14 @@ const resolvers = {
                 console.error(err);
                 return [];
             }
+        },
+        async todo(_, { id }) {
+            const todos = await dbQuery({ query: `SELECT * FROM todos WHERE ID=${id}`});
+
+            if(todos.length === 1) return todos[0];
+            
+            return { ID: -1, name: "" };
+
         }
     }
 };
