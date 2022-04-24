@@ -1,17 +1,34 @@
 const { ApolloServer, gql } = require("apollo-server");
+const { createConnection } = require("mysql");
+
+const connection = createConnection({
+    database: "lesson",
+    host: "localhost",
+    password: "",
+    user: "root,"
+});
+
+connection.connect(() => {
+    console.log("connection created")
+});
+
+const authors = [
+    {
+        name: "Kate Chopin"
+    }, 
+    {
+        name: "Paul Auster"
+    }
+];
 
 const books = [
     {
         title: 'The Awakening',
-        author: {
-            name: 'Kate Chopin',
-        }
+        author: authors[0]
     },
     {
         title: 'City of Glass',
-        author: {
-            name: 'Paul Auster',
-        }
+        author: authors[1]
     },
 ];
 
@@ -54,6 +71,7 @@ const resolvers = {
         }
     },
     Query: {
+        authors: () => authors,
         books: () => books
     }
 };
